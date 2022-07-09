@@ -1,0 +1,219 @@
+<html>
+  <head>
+    <title>Air Jordle Game</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto+Slab"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: rgb(219, 217, 214);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: "Roboto Slab", serif;
+      }
+
+      .dd-vc {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .dd-transition {
+        transition: all 0.3s ease;
+      }
+      .dd-shadow {
+        box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.3);
+      }
+
+      #dragDrop {
+        width: 1400px;
+        margin: 20px auto 0;
+        position: relative;
+        margin-top: 5%;
+      }
+
+      .dd-slot {
+        float: left;
+        outline: 2px dashed rgba(204, 49, 49, 0.75);
+        outline-offset: -15px;
+        position: relative;
+        pointer-events: none;
+      }
+      .dd-slot-num {
+        text-align: center;
+        color: rgba(0, 0, 0, 0.3);
+        font-size: 40px;
+        position: absolute;
+        width: 100%;
+      }
+
+      .dd-item {
+        position: absolute;
+        left: 0;
+        top: 0;
+        box-sizing: border-box;
+        padding: 10px;
+        cursor: pointer;
+      }
+      .dd-item-inner {
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background: #fff;
+      }
+      .dd-item-panel {
+        width: 40%;
+        height: 35px;
+        background: #fff;
+        position: absolute;
+        left: 30%;
+        bottom: -15px;
+        z-index: 5;
+      }
+      .dd-item-title {
+        font-size: 15px;
+        color: rgba(204, 49, 49, 0.75);
+        text-align: center;
+        line-height: 35px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="dragDrop"></div>
+
+    <script>
+      (function () {
+        var _doc = window.document;
+
+        var _numOfImageSlots = 16,
+          _numOfImagesPerRow = 5,
+          _imageMarginBottom = 30;
+
+        var _imageAspectWidth = 1920,
+          _imageAspectHeight = 1080;
+
+        var images = {
+          1: "jordan1.png",
+          2: "jordan2.png",
+          3: "jordan3.png",
+          4: "jordan4.png",
+          5: "jordan5.png",
+          6: "jordan6.png",
+          7: "jordan7.png",
+          8: "jordan8.png",
+          9: "jordan9.png",
+          10: "jordan10.png",
+          11: "jordan11.png",
+          12: "jordan12.png",
+        };
+
+        var imageIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+        function shuffle(array) {
+          let currentIndex = array.length,
+            randomIndex;
+
+          while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            [array[currentIndex], array[randomIndex]] = [
+              array[randomIndex],
+              array[currentIndex],
+            ];
+          }
+
+          return array;
+        }
+
+        shuffle(imageIds);
+
+        function init() {
+          addImageSlots();
+          drawImages();
+        }
+
+        function addImageSlots() {
+          var i = 0,
+            len = _numOfImageSlots,
+            item;
+
+          var wrap = _doc.getElementById("dragDrop");
+
+          for (; i < len; i++) {
+            item = _doc.createElement("div");
+
+            item.setAttribute("class", "dd-slot");
+            item.setAttribute(
+              "style",
+              "width:" +
+                100 / _numOfImagesPerRow +
+                "%;padding-bottom:" +
+                (100 / _numOfImagesPerRow) *
+                  (_imageAspectHeight / _imageAspectWidth) +
+                "%;margin-bottom:" +
+                _imageMarginBottom +
+                "px;"
+            );
+
+            item.innerHTML = '<p class="dd-slot-num dd-vc">' + (i + 1) + "</p>";
+
+            wrap.appendChild(item);
+          }
+        }
+
+        function drawImages() {
+          var i = 0,
+            len = _numOfImageSlots,
+            item;
+
+          var wrap = _doc.getElementById("dragDrop");
+
+          var slot = _doc.getElementsByClassName("dd-slot")[0],
+            bounds = slot.getBoundingClientRect(),
+            itemWidth = bounds.width,
+            itemHeight = bounds.height;
+
+          var itemX, itemY;
+
+          for (; i < len; i++) {
+            itemX = (i % _numOfImagesPerRow) * itemWidth;
+            itemY =
+              Math.floor(i / _numOfImagesPerRow) *
+              (itemHeight + _imageMarginBottom);
+
+            item = _doc.createElement("div");
+
+            item.setAttribute("class", "dd-item dd-transition");
+            item.setAttribute(
+              "style",
+              "width:" +
+                itemWidth +
+                "px;height:" +
+                itemHeight +
+                "px;transform:translate3d(" +
+                itemX +
+                "px," +
+                itemY +
+                "px,0);"
+            );
+
+            item.innerHTML =
+              '<div class="dd-item-inner dd-shadow"><div class="dd-item-panel dd-shadow"><h3 class="dd-item-title">Jordan ??</h3></div></div>';
+
+            wrap.appendChild(item);
+          }
+        }
+
+        init();
+      })();
+    </script>
+  </body>
+</html>
