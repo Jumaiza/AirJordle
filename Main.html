@@ -20,8 +20,9 @@
 		.dd-slot-num { text-align: center; color: rgba(0,0,0,0.3); font-size: 40px; position: absolute; width: 100%; }
 
 		.dd-item { position: absolute; left: 0; top: 0; box-sizing: border-box; padding: 10px; cursor: pointer; }
+		.dd-item.dd-selected { z-index: 20; }
 		.dd-item-inner { background-repeat: no-repeat; background-size: cover; background-position: center; width: 100%; height: 100%; position: relative; background: #fff; }
-		.dd-item-panel { width: 80%; height: 35px; background: #fff; position: absolute; left: 10%; bottom: -15px; z-index: 5; }
+		.dd-item-panel { width: 70%; height: 35px; background: #fff; position: absolute; left: 15%; bottom: -15px; z-index: 5; }
 		.dd-item-title { font-size: 15px; color: rgba(204, 49, 49, 0.75); text-align: center; line-height: 35px; }
 
 	</style>
@@ -44,6 +45,19 @@
 
 			var _imageAspectWidth = 1920,
 					_imageAspectHeight = 1080;
+			
+			var _imageSlots = [],
+				_selectedImageElement = null,
+				_originalImageSlot = null,
+				_originalClickCoords = null,
+				_lastTouchedSlotId = null;
+
+				var wrap = _doc.getElementById('dragDrop'),
+					bounds = wrap.getBoundingClientRect(),
+					left = bounds.left,
+					top = bounds.top;
+				
+				console.log(left,top);
 
 			var _imageLibrary = [
 				{ id: 1, image: '/1-12/jordan1.png', title: 'Air Jordan 1' },
@@ -59,10 +73,7 @@
 				{ id: 11, image: '/1-12/jordan11.png', title: 'Air Jordan 11' },
 				{ id: 12, image: '/1-12/jordan12.png', title: 'Air Jordan 12' }];
 
-			console.log(_imageLibrary);
-
-			var _imageIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-			console.log(_imageIds);
+			var _listedImageIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 			function shuffle(array) {
 				let currentIndex = array.length,
@@ -81,14 +92,14 @@
 				return array;
 			}
 
-			shuffle(_imageIds);
-
-			console.log(_imageIds);
+			shuffle(_listedImageIds);
 
 			function init () {
 
 				addImageSlots();
 				drawImages();
+
+				_doc.getElementById('dragDrop').addEventListener('mousemove', imageMousemove);
 
 			}
 
@@ -103,7 +114,7 @@
 				for ( ; i < len; i++ ) {
 
 					item = _doc.createElement('div');
-
+					item.setAttribute('slot-number',(i+1));
 					item.setAttribute('class', 'dd-slot');
 					item.setAttribute('style', 'width:' + ( 100 / _numOfImagesPerRow ) + '%;padding-bottom:' + ( ( 100 / _numOfImagesPerRow ) * ( _imageAspectHeight / _imageAspectWidth ) ) + '%;margin-bottom:' + _imageMarginBottom + 'px;');
 
@@ -128,10 +139,13 @@
 						itemWidth = bounds.width,
 						itemHeight = bounds.height;
 
-				var itemX,
-						itemY;
+				var itemX,itemY
+				
+				var imageId;
 
 				for ( ; i < len; i++ ) {
+
+					imageId = _listedImageIds[i];
 
 					itemX = ( i % _numOfImagesPerRow ) * itemWidth;
 					itemY = Math.floor( i / _numOfImagesPerRow ) * ( itemHeight + _imageMarginBottom );
@@ -139,15 +153,98 @@
 					item = _doc.createElement('div');
 
 					item.setAttribute('class', 'dd-item dd-transition');
+					item.setAttribute('data-image-id',imageId);
 					item.setAttribute('style', 'width:' + itemWidth + 'px;height:' + itemHeight + 'px;transform:translate3d(' + itemX + 'px,' + itemY + 'px,0);' );
 
-					item.innerHTML = '<div class="dd-item-inner dd-shadow"><div class="dd-item-panel dd-shadow"><h3 class="dd-item-title">Testing title</h3></div></div>';
+					item.innerHTML = '<div class="dd-item-inner dd-shadow"><div class="dd-item-panel dd-shadow"><h3 class="dd-item-title">Jordan ??</h3></div></div>';
 
 					wrap.appendChild(item);
+
+					item.addEventListener('mousedown', imageMousedown);
+					//item.addEventListener('mouseup', imageMouseup);
+
+					_imageSlots[i] = { width: itemWidth, height: itemHeight, x: itemX, y: itemY };
 
 				}
 
 			}
+
+			function imageMousedown(event) {
+
+				if (!_selectedImageElement) {
+
+					_selectedImageElement = event.currentTarget; //current element user is clicking on
+					_originalClickCoords = { x: event.pageX, y: event.pageY }; //where the user clicked
+
+					//get current slot that the image is sitting on. Will be useful later to match slot with image id
+					_originalImageSlot = getIndexOfImageId(_selectedImageElement.getAttribute('data-image-id'));
+
+
+					_selectedImageElement.classList.add('dd-selected');
+					_selectedImageElement.classList.remove('dd-transition');
+
+				}
+
+			}
+
+			function imageMousemove(event) {
+
+				if (_selectedImageElement) {
+
+					var wrap = _doc.getElementById('dragDrop'),
+						bounds = wrap.getBoundingClientRect(),
+						left = bounds.left,
+						top = bounds.top;
+
+					var pageX = event.pageX,
+						pageY = event.pageY;
+
+					var clickX = pageX - left,
+						clickY = pageY - top,
+						hoverSlotId = getSlotIdByCoords({ x: clickX, y: clickY });
+
+					var ele = _selectedImageElement,
+						imageId = ele.getAttribute('data-image-id'),
+						index = _originalImageSlot,
+						newIndex = getIndexOfImageId(imageId),
+						x = _imageSlots[index].x,
+						y = _imageSlots[index].y;
+
+					var resultX = x + (pageX - _originalClickCoords.x),
+						resultY = y + (pageY - _originalClickCoords.y);
+
+					ele.style.transform = 'translate3d(' + resultX + 'px,' + resultY + 'px,0)';
+
+				}
+
+			}
+
+			function getSlotIdByCoords(coords) {
+
+				// Get the current slot being hovered over
+				for (var id in _imageSlots) {
+
+					var slot = _imageSlots[id];
+
+					if (slot.x <= coords.x && coords.x <= slot.x + slot.width && slot.y <= coords.y && coords.y <= slot.y + slot.height)
+						return id;
+
+				}
+
+			}
+
+			function getIndexOfImageId(id) {
+
+				var i = 0,
+					len = _listedImageIds.length;
+
+				for (; i < len; i++)
+					if (_listedImageIds[i] == id)
+						return i;
+
+			}
+			
+
 
 			init();
 
