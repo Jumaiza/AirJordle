@@ -146,11 +146,10 @@
 						}
 					}
 
-					console.log(numCorrect);
 					if(numCorrect==12){
 						guessButton.disabled = true;
 						if (confirm("Congrats on winning. Press OK or Refresh to play again!")) {
-							window.location.replace("http://127.0.0.1:5500/Main.html");
+							window.location.reload();
 						} 
 					}
 					else if(attempts==0 ){
@@ -168,7 +167,7 @@
 						}
 
 						if (confirm("You ran out of attempts. Press OK or Refresh to try again!")) {
-							window.location.replace("airjordle.com");
+							window.location.reload();
 						} 
 					}
 
