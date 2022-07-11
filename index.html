@@ -116,12 +116,12 @@
 			}
 
 			var attempts=3;
-			var numCorrect=0;
-
 			function checkGuess() {
 
 					var guessButton = _doc.getElementById("submitButton");
 					guessButton.addEventListener("click",function(){
+
+					var numCorrect=0;
 
 					attempts--;
 					_doc.getElementById('attemptsLeft').innerHTML=attempts+" Attempts Left!";
@@ -146,7 +146,14 @@
 						}
 					}
 
-					if(attempts==0){
+					console.log(numCorrect);
+					if(numCorrect==12){
+						guessButton.disabled = true;
+						if (confirm("Congrats on winning. Press OK or Refresh to play again!")) {
+							window.location.replace("http://127.0.0.1:5500/Main.html");
+						} 
+					}
+					else if(attempts==0 ){
 
 						guessButton.disabled=true;
 
@@ -161,16 +168,12 @@
 						}
 
 						if (confirm("You ran out of attempts. Press OK or Refresh to try again!")) {
-							window.location.replace("http://127.0.0.1:5500/Main.html");
+							window.location.replace("airjordle.com");
 						} 
 					}
 
-					else if(numCorrect==12){
-						guessButton.disabled = true;
-						if (confirm("Congrats on winning. Press OK or Refresh to play again!")) {
-							window.location.replace("http://127.0.0.1:5500/Main.html");
-						} 
-					}
+					console.log(attempts);
+
 				});
 
 				}
