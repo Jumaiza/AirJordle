@@ -14,7 +14,7 @@
 		.dd-transition { transition: all 0.3s ease; }
 		.dd-shadow { box-shadow: 0 0 3px 1px rgba(0,0,0,0.3); }
 
-		#dragDrop { width: 1400px; margin: 20px auto 0; position: relative;}
+		#dragDrop { width: 1400px; margin: 10px auto 0; position: relative;}
 		#submitButton {background-color: rgb(214, 39, 39); font-size: 25px; width: 20%; height: 5%; position: absolute; bottom: 7.5%; left: 40%;
 			cursor: pointer; box-shadow: 0 0 3px 1px rgba(0,0,0,0.7);
 			opacity: 0.8;
@@ -35,7 +35,7 @@
 		.dd-item-correct{ outline: 4px solid green; outline-offset: -10px; border-radius: 10px;}
 		.dd-item-incorrect{outline: 4px solid red; outline-offset: -10px; border-radius: 10px;}
 
-		.dd-item-panel { width: 60%; height: 35px; background: #fff; position: absolute; left: 20%; bottom: -25px; z-index: 5; }
+		.dd-item-panel { width: 50%; height: 35px; background: rgb(199, 199, 199); position: absolute; left: 25%; bottom: -25px; z-index: 5; outline: 1px solid rgb(134, 132, 132);}
 		.dd-item-title { font-size: 15px; color: black; text-align: center; line-height: 35px; }
 
 	</style>
@@ -44,11 +44,10 @@
 
 <body>
     
-    <h1 style="text-align: center; margin-top: 20px; color: rgba(255, 1, 1, 0.75);">Welcome to Air Jordle!</h1>
+    <h1 style="text-align: center; margin-top: 20px; color: black;">Welcome to Air Jordle!</h1>
     <h2 style="text-align: center;"> These Air Jordans are shuffled. Order them from 1-12 to win. You have 3 tries!</h2>
-
+	<h3 style="text-align: center; color: rgba(223, 35, 35, 0.75)"> Developed By Zaid Abujumaiza</h3>
 	<div id="dragDrop"></div>
-
 	<input id="submitButton" type="submit" value="Guess">
 	<h3 id="attemptsLeft">3 Attempts Left!</h3>
 
