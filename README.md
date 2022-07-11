@@ -1,2 +1,2 @@
 # Air-Jordle Game Project
-[Link](www.airjordle.com)
+<a href="www.airjordle.com" target="_blank">Link</a>
