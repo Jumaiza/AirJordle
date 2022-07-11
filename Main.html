@@ -15,21 +15,26 @@
 		.dd-shadow { box-shadow: 0 0 3px 1px rgba(0,0,0,0.3); }
 
 		#dragDrop { width: 1400px; margin: 20px auto 0; position: relative;}
-		#submitButton {background-color: red; font-size: 25px; width: 20%; height: 5%; position: absolute; bottom: 7.5%; left: 40%;
+		#submitButton {background-color: rgb(214, 39, 39); font-size: 25px; width: 20%; height: 5%; position: absolute; bottom: 7.5%; left: 40%;
 			cursor: pointer; box-shadow: 0 0 3px 1px rgba(0,0,0,0.7);
-			opacity: 0.6;
+			opacity: 0.8;
 		}
 		#submitButton:hover{
 			opacity: 1;
 		}
+		#attemptsLeft{ position: absolute; bottom: 4%; right: 46.5%;}
 
 		.dd-slot { float: left; outline: 3px dashed rgba(204, 49, 49, 0.75); outline-offset: -15px; position: relative; pointer-events: none; }
 		.dd-slot-num { text-align: center; color: rgba(0,0,0,0.3); font-size: 40px; position: absolute; width: 100%; }
 
-		.dd-item { position: absolute; left: 0; top: 0; box-sizing: border-box; padding: 10px; cursor: pointer; }
+		.dd-item { position: absolute; left: 0; top: 0; box-sizing: border-box; padding: 10px; cursor: pointer;}
         .dd-item.dd-disabled { pointer-events: none; opacity: 0; }
         .dd-item.dd-selected { z-index: 20; }
+
 		.dd-item-inner { background:#ffff;background-repeat: no-repeat; background-size: 85%; background-position: center; width: 100%; height: 100%; position: relative; }
+		.dd-item-correct{ outline: 4px solid green; outline-offset: -10px; border-radius: 10px;}
+		.dd-item-incorrect{outline: 4px solid red; outline-offset: -10px; border-radius: 10px;}
+
 		.dd-item-panel { width: 60%; height: 35px; background: #fff; position: absolute; left: 20%; bottom: -25px; z-index: 5; }
 		.dd-item-title { font-size: 15px; color: black; text-align: center; line-height: 35px; }
 
@@ -39,12 +44,13 @@
 
 <body>
     
-    <h1 style="text-align: center; margin-top: 20px; color: red;">Air Jordle</h1>
-    <h2 style="text-align: center;"> These Air Jordans are shuffled. Order them from 1-12 to win! You have 3 tries.</h2>
+    <h1 style="text-align: center; margin-top: 20px; color: rgba(255, 1, 1, 0.75);">Welcome to Air Jordle!</h1>
+    <h2 style="text-align: center;"> These Air Jordans are shuffled. Order them from 1-12 to win. You have 3 tries!</h2>
 
 	<div id="dragDrop"></div>
 
 	<input id="submitButton" type="submit" value="Guess">
+	<h3 id="attemptsLeft">3 Attempts Left!</h3>
 
 	<script>
 	
@@ -105,8 +111,71 @@
 				drawImages();
 
 				_doc.getElementById('dragDrop').addEventListener('mousemove', imageMousemove);
+				
+				checkGuess();
 
 			}
+
+			var attempts=3;
+			var numCorrect=0;
+
+			function checkGuess() {
+
+					var guessButton = _doc.getElementById("submitButton");
+					guessButton.addEventListener("click",function(){
+
+					attempts--;
+					_doc.getElementById('attemptsLeft').innerHTML=attempts+" Attempts Left!";
+						
+					var i = 0;
+					var len = _listedImageIds.length;
+
+					for (; i<len;i++){
+
+						currentShoe = _listedImageIds[i];
+						slotOfShoe = getIndexOfImageId(currentShoe)+1;
+						element = _doc.querySelector('[data-image-id="' + currentShoe + '"]');
+
+						if(currentShoe==slotOfShoe){
+							element.classList.remove('dd-item-incorrect');
+							element.classList.add('dd-item-correct');
+							title=_doc.getElementById('title'+currentShoe);
+							title.innerHTML="Air Jordan "+currentShoe;
+							numCorrect++;
+						}else{
+							element.classList.add('dd-item-incorrect');
+						}
+					}
+
+					if(attempts==0){
+
+						guessButton.disabled=true;
+
+						var i = 0,
+							len = _listedImageIds.length;
+
+						for (; i<len;i++){
+
+							currentShoe = _listedImageIds[i];
+							title=_doc.getElementById('title'+currentShoe);
+							title.innerHTML="Air Jordan "+currentShoe;
+						}
+
+						if (confirm("You ran out of attempts. Press OK or Refresh to try again!")) {
+							window.location.replace("http://127.0.0.1:5500/Main.html");
+						} 
+					}
+
+					else if(numCorrect==12){
+						guessButton.disabled = true;
+						if (confirm("Congrats on winning. Press OK or Refresh to play again!")) {
+							window.location.replace("http://127.0.0.1:5500/Main.html");
+						} 
+					}
+				});
+
+				}
+
 
 			function addImageSlots () {
 
@@ -165,7 +234,7 @@
 					item.setAttribute('data-image-id', imageId);
 					item.setAttribute('style', 'width:' + itemWidth + 'px;height:' + itemHeight + 'px;transform:translate3d(' + itemX + 'px,' + itemY + 'px,0);' );
 
-					item.innerHTML = '<div class="dd-item-inner dd-shadow" style="' + ( image ? ( 'background-image:url(' + image.image + ')' ) : '' ) + '"><div class="dd-item-panel dd-shadow"><h3 class="dd-item-title">Air Jordan ??</h3></div></div>';
+					item.innerHTML = '<div class="dd-item-inner dd-shadow" style="' + ( image ? ( 'background-image:url(' + image.image + ')' ) : '' ) + '"><div class="dd-item-panel dd-shadow"><h3 class="dd-item-title" id=title'+(imageId)+'>Air Jordan ??</h3></div></div>';
 
 					wrap.appendChild(item);
 
