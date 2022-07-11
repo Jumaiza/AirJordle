@@ -1,2 +1,2 @@
 # Air-Jordle Game Project
-[Link](airjordle.com)
+[Link](www.airjordle.com)
